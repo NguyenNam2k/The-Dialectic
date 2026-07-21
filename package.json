@@ -1,0 +1,13 @@
+{
+  "name": "ss-conquest-root",
+  "version": "1.0.0",
+  "description": "Root workspace coordinator for CNXHKH Interactive Lab & Debate Simulator",
+  "scripts": {
+    "dev": "node dev.js",
+    "install-all": "cmd.exe /c \"cd Server && npm install && cd ../Client && npm install\"",
+    "build": "cmd.exe /c \"cd Client && npm run build\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

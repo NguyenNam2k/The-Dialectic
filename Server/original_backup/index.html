@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Website ôn tập MLN131 - Chủ nghĩa xã hội khoa học theo chương, có lý thuyết, flashcard và trắc nghiệm." />
+  <title>MLN131 - Ôn tập CNXHKH</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Về trang đầu">
+        <span class="brand-mark">MLN131</span>
+        <span>
+          <strong>Ôn tập CNXHKH</strong>
+          <small>Đọc lý thuyết → học flashcard → làm trắc nghiệm/kiểm tra</small>
+        </span>
+      </a>
+
+      <nav class="top-nav" aria-label="Điều hướng chính">
+        <button class="nav-btn active" data-view="overview">Tổng quan</button>
+        <button class="nav-btn" data-view="chapters">Theo chương</button>
+        <button class="nav-btn" data-view="flashcards">Flashcard</button>
+        <button class="nav-btn" data-view="quiz">Trắc nghiệm</button>
+      </nav>
+
+      <button id="themeToggle" class="icon-btn" type="button" aria-label="Đổi giao diện sáng tối">☾</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">MLN131 · CHỦ NGHĨA XÃ HỘI KHOA HỌC</p>
+          <h1>Học theo đúng trình tự: đọc lý thuyết trước, rồi luyện flashcard và kiểm tra</h1>
+          <p class="hero-copy">
+            Website tóm hợp kiến thức 7 chương, mỗi chương có 70 flashcard và tối đa 70 câu trắc nghiệm.
+            Người học có thể chọn bài 10, 20, 30, 40, 50, 60 hoặc 70 câu.
+          </p>
+          <div class="hero-actions">
+            <button class="primary-btn" data-go="chapters">Bắt đầu học theo chương</button>
+            <button class="secondary-btn" data-go="quiz">Làm trắc nghiệm</button>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="Tiến độ học tập">
+          <div class="progress-ring" id="progressRing">
+            <span id="progressPercent">0%</span>
+          </div>
+          <div>
+            <h2>Tiến độ học tập</h2>
+            <p><strong id="completedCount">0</strong>/7 chương đã đánh dấu đã học lý thuyết</p>
+            <p>Điểm cao nhất: <strong id="bestScore">0%</strong></p>
+            <p class="muted-note">Gợi ý: học lý thuyết xong hãy chuyển sang flashcard và trắc nghiệm.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="container section" id="appView" aria-live="polite"></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>Nội dung được tổng hợp ngắn gọn từ giáo trình Chủ nghĩa xã hội khoa học để phục vụ ôn tập.</p>
+      <button id="resetProgress" class="text-btn" type="button">Xóa tiến độ đã lưu</button>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="flashcards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

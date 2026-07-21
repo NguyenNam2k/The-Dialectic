@@ -1,0 +1,215 @@
+import React, { useState } from 'react';
+import DialecticTimeline from './DialecticTimeline';
+import SocialistRadar from './SocialistRadar';
+import { playSoftClick } from '../utils/soundEffects';
+
+const quotes = [
+  { text: "Các nhà triết học chỉ giải thích thế giới bằng nhiều cách khác nhau, vấn đề là cải tạo thế giới.", author: "C.Mác", work: "Luận đề về Phoiơbắc (1845)" },
+  { text: "Bản chất của con người không phải là một cái gì trừu tượng vốn có của cá nhân riêng biệt. Trong tính thực tại của nó, bản chất con người là tổng hòa những quan hệ xã hội.", author: "C.Mác & Ph.Ăngghen", work: "Gia đình thần thánh (1845)" },
+  { text: "Học, học nữa, học mãi. Không có lý luận cách mạng thì không thể có phong trào cách mạng.", author: "V.I.Lênin", work: "Làm gì? (1902)" },
+  { text: "Chủ nghĩa xã hội cộng với điện khí hóa toàn quốc.", author: "V.I.Lênin", work: "Nhiệm vụ của Đoàn thanh niên (1920)" },
+  { text: "Dân chủ là một giá trị nhân loại. Không có dân chủ xã hội chủ nghĩa thì không có chủ nghĩa xã hội.", author: "Hồ Chí Minh", work: "Tác phẩm chọn lọc" }
+];
+
+export default function JournalCover({ progress, data, setView, setSelectedChapterId }) {
+  const { chapters = [] } = data;
+  const { xp = 0, level = 1, learnedChapters = [] } = progress;
+
+  const [quoteIdx, setQuoteIdx] = useState(0);
+
+  const getScholarRank = (lvl) => {
+    if (lvl < 3) return 'Độc giả Tập sự';
+    if (lvl < 6) return 'Nghiên cứu sinh Biện chứng';
+    if (lvl < 10) return 'Học giả Học thuyết Marx';
+    return 'Viện sĩ CNXHKH';
+  };
+
+  const getChapterCategory = (id) => {
+    switch(id) {
+      case 1: return 'Nhập môn Triết học';
+      case 2: return 'Chủ thể Lịch sử';
+      case 3: return 'Hình thái Xã hội';
+      case 4: return 'Thiết chế Chính trị';
+      case 5: return 'Cơ cấu Xã hội';
+      case 6: return 'Tôn giáo & Dân tộc';
+      case 7: return 'Đời sống Xã hội';
+      case 8: return 'Triết học Mác-xít';
+      case 9: return 'Kinh tế Chính trị';
+      case 10: return 'Kỷ nguyên AI & Số';
+      case 11: return 'Văn hóa & Con người';
+      case 12: return 'Việt Nam & 2045';
+      default: return 'Lý luận học';
+    }
+  };
+
+  const coverStory = chapters.find(c => c.id === 12) || chapters.find(c => c.id === 2) || chapters[0];
+  const otherStories = chapters.filter(c => c.id !== coverStory?.id);
+
+  const totalArticles = chapters.length || 12;
+  const readCount = (learnedChapters || []).length;
+  const percentRead = Math.round((readCount / totalArticles) * 100);
+
+  const currentQuote = quotes[quoteIdx];
+
+  const handleNextQuote = () => {
+    playSoftClick();
+    setQuoteIdx((prev) => (prev + 1) % quotes.length);
+  };
+
+  return (
+    <div className="cover-container page-transition">
+      {/* Left Column */}
+      <div>
+        <div className="cover-masthead">
+          <p className="cover-issue">Volume I · Tạp chí & E-Book Khảo luận Đặc biệt năm 2026</p>
+          <h1 className="cover-title">THE DIALECTIC</h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.8rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--accent-burgundy)', fontWeight: 'bold' }}>
+            Tạp chí & E-Book Học thuật Chủ nghĩa xã hội khoa học (12 Chương)
+          </p>
+        </div>
+
+        {/* Cover Hero Article */}
+        {coverStory && (
+          <div className="cover-hero-article card" style={{ padding: '2.5rem', border: '1px solid var(--border-color)', marginBottom: '2.5rem' }}>
+            <span className="article-cat">{getChapterCategory(coverStory.id)}</span>
+            <h2 className="cover-hero-title">
+              {coverStory.title}
+            </h2>
+            <p className="cover-hero-intro">
+              {coverStory.intro}
+            </p>
+            <button 
+              className="btn btn-primary"
+              onClick={() => {
+                playSoftClick();
+                setSelectedChapterId(coverStory.id);
+                setView('reader');
+              }}
+            >
+              Đọc chuyên luận tiêu điểm (Chương {coverStory.id}) →
+            </button>
+          </div>
+        )}
+
+        {/* Interactive Dialectic Historical Timeline */}
+        <DialecticTimeline />
+
+        {/* Other Chapters List */}
+        <div className="articles-list">
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1.5rem', textTransform: 'uppercase' }}>
+            Mục lục E-Book & Tạp chí (12 Chương)
+          </h2>
+          {otherStories.map((ch, idx) => (
+            <div key={ch.id} className={`article-summary-card stagger-item stagger-${Math.min(idx + 1, 7)}`}>
+              <div className="article-summary-content">
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <span className="article-cat">{getChapterCategory(ch.id)}</span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>⏱ {ch.readTime || '8 phút đọc'}</span>
+                </div>
+                <h3 className="article-title-link" style={{ cursor: 'pointer' }} onClick={() => {
+                  playSoftClick();
+                  setSelectedChapterId(ch.id);
+                  setView('reader');
+                }}>
+                  Chương {ch.id}: {ch.title}
+                </h3>
+                <p className="article-excerpt">
+                  {ch.intro ? ch.intro.substring(0, 140) : ''}...
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => {
+                    playSoftClick();
+                    setSelectedChapterId(ch.id);
+                    setView('reader');
+                  }}
+                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
+                >
+                  {(learnedChapters || []).includes(ch.id) ? '✓ Đọc lại' : 'Đọc bài'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Interactive Socialist Radar Indicator Simulator */}
+        <SocialistRadar />
+      </div>
+
+      {/* Right Sidebar Panel */}
+      <div className="sidebar-panel">
+        <div>
+          <h3 className="sidebar-title">Lời nói đầu E-Book</h3>
+          <p className="editorial-note">
+            "Tập san & E-Book Biện chứng được biên soạn dưới dạng dòng chảy tạp chí học thuật lai sách điện tử 12 chương. Toàn bộ kiến thức lý luận chuẩn quốc gia được trực quan hóa thành các biểu đồ động lực học lịch sử, biên bản đối thoại kiểm duyệt và bài khảo luận chuyên sâu."
+          </p>
+          <p className="editorial-note" style={{ textAlign: 'right', fontWeight: 'bold' }}>
+            — Ban Biên Tập
+          </p>
+        </div>
+
+        {/* Daily Dialectic Quote Widget */}
+        <div className="card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', margin: '2rem 0', backgroundColor: 'var(--bg-card)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent-gold)' }}>
+              💭 Trích dẫn Biện chứng
+            </span>
+            <button 
+              onClick={handleNextQuote}
+              style={{ background: 'none', border: 'none', color: 'var(--accent-burgundy)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold' }}
+            >
+              🔄 Trích dẫn khác
+            </button>
+          </div>
+          
+          <blockquote key={currentQuote.text} className="page-transition" style={{ fontStyle: 'italic', fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: '1.5', margin: '0.5rem 0' }}>
+            "{currentQuote.text}"
+          </blockquote>
+          
+          <div style={{ textAlign: 'right', fontSize: '0.8rem', color: 'var(--accent-burgundy)', fontWeight: 'bold', marginTop: '0.5rem' }}>
+            — {currentQuote.author} <span style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>({currentQuote.work})</span>
+          </div>
+        </div>
+
+        {/* Reader Scholar Progress Card */}
+        <div className="card" style={{ border: '1px solid var(--border-color)', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+            Độ sâu Tri thức Độc giả (12 Chương)
+          </h3>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+            <span>Số chương đã tiếp thu</span>
+            <strong>{readCount} / {totalArticles} chương</strong>
+          </div>
+          <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '10px', marginBottom: '1.5rem', overflow: 'hidden' }}>
+            <div style={{ width: `${percentRead}%`, height: '100%', backgroundColor: 'var(--accent-burgundy)', transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}></div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+              <span>Cấp học vị:</span>
+              <strong style={{ color: 'var(--accent-burgundy)' }}>{getScholarRank(level)} (Cấp {level})</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+              <span>Học điểm tích lũy:</span>
+              <strong>{xp} Điểm luận thuyết</strong>
+            </div>
+          </div>
+
+          <button 
+            className="btn btn-primary" 
+            style={{ width: '100%', marginTop: '1.5rem' }} 
+            onClick={() => {
+              playSoftClick();
+              setView('assessment');
+            }}
+          >
+            Tự Đánh Giá Độc Giả
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
