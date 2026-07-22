@@ -37,8 +37,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
   const { chapters = [] } = data;
   const [activeNoteKey, setActiveNoteKey] = useState(null);
   const [scrollPercent, setScrollPercent] = useState(0);
-
-  // E-Book Reader Controls State
   const [fontSize, setFontSize] = useState(17); // 15, 17, 20, 23
   const [fontFamily, setFontFamily] = useState('serif'); // 'serif', 'sans', 'mono'
   const [zenMode, setZenMode] = useState(false); // Focus mode hiding sidebars
@@ -149,7 +147,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
 
   return (
     <div className="reader-container page-transition" style={{ position: 'relative' }}>
-      {/* Scroll Progress Bar Top Fixed */}
       <div 
         style={{ 
           position: 'fixed', 
@@ -229,8 +226,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
             E-Book Chuyên luận · {currentChapter.readTime || '8 phút đọc'} · Trang {currentChapter.page} · Chuyên mục Lý luận Triết học
           </div>
         </div>
-
-        {/* E-Book Body with Dynamic Font Scaling */}
         <div className="reader-article-body" style={{ fontSize: `${fontSize}px`, fontFamily: fontStyleFamily, lineHeight: '1.75' }}>
           <p className="drop-cap" style={{ fontStyle: 'italic', color: 'var(--text-primary)', marginBottom: '2rem' }}>
             {renderParagraphWithHotwords(currentChapter.intro)}

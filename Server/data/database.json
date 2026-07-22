@@ -1,8 +1,10 @@
 {
-  "xp": 0,
+  "xp": 40,
   "level": 1,
   "learnedChapters": [],
-  "debateCompleted": [],
+  "debateCompleted": [
+    "roundtable-1"
+  ],
   "quizHistory": [],
   "bookmarks": []
 }

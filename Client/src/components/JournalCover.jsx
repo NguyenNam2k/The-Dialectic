@@ -1,22 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DialecticTimeline from './DialecticTimeline';
 import SocialistRadar from './SocialistRadar';
 import { playSoftClick } from '../utils/soundEffects';
 
-const quotes = [
-  { text: "Các nhà triết học chỉ giải thích thế giới bằng nhiều cách khác nhau, vấn đề là cải tạo thế giới.", author: "C.Mác", work: "Luận đề về Phoiơbắc (1845)" },
-  { text: "Bản chất của con người không phải là một cái gì trừu tượng vốn có của cá nhân riêng biệt. Trong tính thực tại của nó, bản chất con người là tổng hòa những quan hệ xã hội.", author: "C.Mác & Ph.Ăngghen", work: "Gia đình thần thánh (1845)" },
-  { text: "Học, học nữa, học mãi. Không có lý luận cách mạng thì không thể có phong trào cách mạng.", author: "V.I.Lênin", work: "Làm gì? (1902)" },
-  { text: "Chủ nghĩa xã hội cộng với điện khí hóa toàn quốc.", author: "V.I.Lênin", work: "Nhiệm vụ của Đoàn thanh niên (1920)" },
-  { text: "Dân chủ là một giá trị nhân loại. Không có dân chủ xã hội chủ nghĩa thì không có chủ nghĩa xã hội.", author: "Hồ Chí Minh", work: "Tác phẩm chọn lọc" }
+const rawQuotes = [
+  { 
+    text: "Bản chất của con người không phải là một cái gì trừu tượng vốn có của cá nhân riêng biệt. Trong tính hiện thực của nó, bản chất con người là tổng hòa những quan hệ xã hội.", 
+    author: "C. Mác", 
+    work: "Luận cương về Feuerbach, Luận cương VI (1845)" 
+  },
+  { 
+    text: "Không có lý luận cách mạng thì không thể có phong trào cách mạng.", 
+    author: "V.I. Lênin", 
+    work: "Làm gì? (1902)" 
+  },
+  { 
+    text: "Chủ nghĩa cộng sản là chính quyền Xô viết cộng với điện khí hóa toàn quốc.", 
+    author: "V.I. Lênin", 
+    work: "Vị thế đối nội và đối ngoại của chúng ta và nhiệm vụ của Đảng, 21/11/1920" 
+  },
+  { 
+    text: "Nước ta là nước dân chủ, địa vị cao nhất là dân, vì dân là chủ.", 
+    author: "Hồ Chí Minh", 
+    work: "Toàn tập, tập 7, tr. 434" 
+  },
+  { 
+    text: "Các nhà triết học chỉ giải thích thế giới bằng nhiều cách khác nhau, song vấn đề là cải tạo thế giới.", 
+    author: "C. Mác", 
+    work: "Luận cương về Feuerbach, Luận cương XI (1845)" 
+  },
+  { 
+    text: "Hhọc thuyết của Mác là học thuyết vạn năng vì nó là một học thuyết chính xác.", 
+    author: "V.I. Lênin", 
+    work: "Ba nguồn gốc và ba bộ phận hợp thành của chủ nghĩa Mác (1913)" 
+  },
+  { 
+    text: "Giai cấp tư sản, trong quá trình thống trị giai cấp chưa đầy một thế kỷ, đã tạo ra những lực lượng sản xuất nhiều hơn và đồ sộ hơn lực lượng sản xuất của tất cả các thế hệ trước kia gộp lại.", 
+    author: "C. Mác & Ph. Ăngghen", 
+    work: "Tuyên ngôn của Đảng Cộng sản (1848)" 
+  },
+  { 
+    text: "Thực hành dân chủ là cái chìa khoá vạn năng có thể giải quyết mọi khó khăn.", 
+    author: "Hồ Chí Minh", 
+    work: "Toàn tập, tập 15, tr. 293" 
+  },
+  { 
+    text: "Học tập chủ nghĩa Mác - Lênin là học tập tinh thần, lập trường, quan điểm và phương pháp để vận dụng vào thực tiễn, không phải học thuộc lòng từng câu từng chữ.", 
+    author: "Hồ Chí Minh", 
+    work: "Bài nói tại Lớp huấn luyện đảng viên (1958)" 
+  },
+  { 
+    text: "Tự do không phải là sự độc lập đối với các quy luật tự nhiên, mà là sự nhận thức được các quy luật đó để phục vụ cho mục đích của con người.", 
+    author: "Ph. Ăngghen", 
+    work: "Chống Đuy-rinh (1878)" 
+  }
 ];
+
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 export default function JournalCover({ progress, data, setView, setSelectedChapterId }) {
   const { chapters = [] } = data;
   const { xp = 0, level = 1, learnedChapters = [] } = progress;
 
+  const [shuffledQuotes, setShuffledQuotes] = useState(() => shuffle(rawQuotes));
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [showExtendedChapters, setShowExtendedChapters] = useState(false);
+
+  useEffect(() => {
+    setShuffledQuotes(shuffle(rawQuotes));
+    setQuoteIdx(0);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setQuoteIdx((prev) => (prev + 1) % shuffledQuotes.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [shuffledQuotes.length]);
 
   const getScholarRank = (lvl) => {
     if (lvl < 3) return 'Độc giả Tập sự';
@@ -51,11 +118,11 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
   const readCount = (learnedChapters || []).length;
   const percentRead = Math.round((readCount / totalArticles) * 100);
 
-  const currentQuote = quotes[quoteIdx];
+  const currentQuote = shuffledQuotes[quoteIdx] || rawQuotes[0];
 
   const handleNextQuote = () => {
     playSoftClick();
-    setQuoteIdx((prev) => (prev + 1) % quotes.length);
+    setQuoteIdx((prev) => (prev + 1) % shuffledQuotes.length);
   };
 
   return (
@@ -68,6 +135,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             Tạp chí Nghiên cứu & Khảo luận Chủ nghĩa xã hội khoa học
           </p>
         </div>
+
         {coverStory && (
           <div className="cover-hero-article card" style={{ padding: '2.5rem', border: '1px solid var(--border-color)', marginBottom: '2.5rem' }}>
             <span className="article-cat">{getChapterCategory(coverStory.id)}</span>
@@ -89,9 +157,9 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             </button>
           </div>
         )}
+
         <DialecticTimeline />
 
-        {/* Main 7 Chapters List */}
         <div className="articles-list">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', textTransform: 'uppercase' }}>
@@ -135,6 +203,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
               </div>
             </div>
           ))}
+
           <div style={{ textAlign: 'center', margin: '1.5rem 0' }}>
             <button 
               className="btn btn-secondary"
@@ -157,6 +226,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
               }
             </button>
           </div>
+
           {showExtendedChapters && (
             <div className="page-transition" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem', borderTop: '2px dashed var(--border-color)', paddingTop: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -166,7 +236,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Chuyên sâu & Hiện đại</span>
               </div>
 
-              {extendedStories.map((ch, idx) => (
+              {extendedStories.map((ch) => (
                 <div key={ch.id} className="article-summary-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                   <div className="article-summary-content">
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -202,8 +272,10 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             </div>
           )}
         </div>
+
         <SocialistRadar />
       </div>
+
       <div className="sidebar-panel">
         <div>
           <h3 className="sidebar-title">Lời nói đầu E-Book</h3>
@@ -214,10 +286,11 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             — Ban Biên Tập
           </p>
         </div>
+
         <div className="card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', margin: '2rem 0', backgroundColor: 'var(--bg-card)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent-gold)' }}>
-              💭 Trích dẫn Biện chứng
+              💭 Trích dẫn Biện chứng ({quoteIdx + 1}/10)
             </span>
             <button 
               onClick={handleNextQuote}
@@ -232,9 +305,10 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
           </blockquote>
           
           <div style={{ textAlign: 'right', fontSize: '0.8rem', color: 'var(--accent-burgundy)', fontWeight: 'bold', marginTop: '0.5rem' }}>
-            — {currentQuote.author} <span style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>({currentQuote.work})</span>
+            — {currentQuote.author}, <span style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>{currentQuote.work}</span>
           </div>
         </div>
+
         <div className="card" style={{ border: '1px solid var(--border-color)', padding: '1.5rem' }}>
           <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
             Độ sâu Tri thức Độc giả (12 Chương)
