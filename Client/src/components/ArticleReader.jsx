@@ -42,6 +42,7 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
   const [fontSize, setFontSize] = useState(17); // 15, 17, 20, 23
   const [fontFamily, setFontFamily] = useState('serif'); // 'serif', 'sans', 'mono'
   const [zenMode, setZenMode] = useState(false); // Focus mode hiding sidebars
+  const [showMoreSidebar, setShowMoreSidebar] = useState(false);
 
   const currentChapter = chapters.find(c => c.id === selectedChapterId) || chapters[0];
 
@@ -143,6 +144,9 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
     ? 'monospace' 
     : 'var(--font-serif)';
 
+  const mainChaptersList = chapters.filter(c => c.id <= 7);
+  const extraChaptersList = chapters.filter(c => c.id > 7);
+
   return (
     <div className="reader-container page-transition" style={{ position: 'relative' }}>
       {/* Scroll Progress Bar Top Fixed */}
@@ -158,18 +162,12 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
           transition: 'width 0.15s ease-out' 
         }} 
       />
-
-      {/* Main E-Book Article Container */}
       <article className="reader-article" style={{ gridColumn: zenMode ? '1 / -1' : undefined, margin: zenMode ? '0 auto' : undefined }}>
-        {/* Navigation & E-Book Toolbar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <button className="btn btn-secondary" onClick={() => { playSoftClick(); setView('dashboard'); }} style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
             ← Quay lại Trang bìa
           </button>
-
-          {/* E-Book Reader Controls Bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '0.35rem 0.8rem', borderRadius: '50px', fontSize: '0.75rem' }}>
-            {/* Font Size Adjusters */}
             <button 
               onClick={() => { playSoftClick(); setFontSize(Math.max(14, fontSize - 2)); }}
               style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}
@@ -186,8 +184,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
               A+
             </button>
             <span style={{ color: 'var(--text-muted)' }}>|</span>
-
-            {/* Font Family Toggle */}
             <select 
               value={fontFamily} 
               onChange={(e) => { playSoftClick(); setFontFamily(e.target.value); }}
@@ -207,8 +203,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
               <option value="mono" style={{ backgroundColor: '#1c1317', color: '#f5f3f0' }}>Phông Báo cáo (Mono)</option>
             </select>
             <span style={{ color: 'var(--text-muted)' }}>|</span>
-
-            {/* Zen Focus Mode Toggle */}
             <button 
               onClick={() => { playSoftClick(); setZenMode(!zenMode); }}
               style={{ background: 'none', border: 'none', color: zenMode ? 'var(--accent-burgundy)' : 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}
@@ -217,8 +211,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
               {zenMode ? '📖 Đọc chuẩn' : '🧘 Thả lỏng Zen'}
             </button>
             <span style={{ color: 'var(--text-muted)' }}>|</span>
-
-            {/* Bookmark Button */}
             <button 
               onClick={handleToggleBookmark}
               style={{ background: 'none', border: 'none', color: isBookmarked ? 'var(--accent-gold)' : 'var(--text-muted)', cursor: 'pointer' }}
@@ -228,7 +220,7 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
             </button>
           </div>
 
-          <span className="reader-article-cat">Chương {currentChapter.id} / 12</span>
+          <span className="reader-article-cat">Chương {currentChapter.id} / {chapters.length}</span>
         </div>
 
         <div className="reader-article-header">
@@ -277,8 +269,6 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
               </div>
             </div>
           )}
-
-          {/* Chapter Pagination Footer */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '2rem', marginTop: '3rem', flexWrap: 'wrap', gap: '1rem' }}>
             <button 
               className="btn btn-secondary" 
@@ -318,16 +308,14 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
           </div>
         </div>
       </article>
-
-      {/* Right Column Sidebar (Hidden in Zen Mode) */}
       {!zenMode && (
         <div className="marginalia">
           <h3 className="sidebar-title" style={{ fontSize: '0.9rem', marginBottom: '1.25rem' }}>
-            📚 Mục lục E-Book 12 Chương
+            📚 Mục lục 7 Chương Chuẩn
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '350px', overflowY: 'auto', marginBottom: '2rem', paddingRight: '0.5rem' }}>
-            {chapters.map((ch) => {
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '280px', overflowY: 'auto', marginBottom: '1.5rem', paddingRight: '0.5rem' }}>
+            {mainChaptersList.map((ch) => {
               const isActive = ch.id === selectedChapterId;
               const isRead = (progress.learnedChapters || []).includes(ch.id);
 
@@ -364,6 +352,68 @@ export default function ArticleReader({ progress, data, selectedChapterId, setSe
               );
             })}
           </div>
+
+          <button
+            onClick={() => {
+              playSoftClick();
+              setShowMoreSidebar(!showMoreSidebar);
+            }}
+            style={{
+              width: '100%',
+              background: 'none',
+              border: '1px dashed var(--border-color)',
+              color: 'var(--accent-gold)',
+              fontSize: '0.75rem',
+              fontWeight: 'bold',
+              padding: '0.4rem',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              marginBottom: '1.5rem'
+            }}
+          >
+            {showMoreSidebar ? '▲ Thu gọn 5 chương mở rộng' : '▼ Xem thêm 5 chương mở rộng (8-12)'}
+          </button>
+
+          {showMoreSidebar && (
+            <div className="page-transition" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '2rem' }}>
+              {extraChaptersList.map((ch) => {
+                const isActive = ch.id === selectedChapterId;
+                const isRead = (progress.learnedChapters || []).includes(ch.id);
+
+                return (
+                  <button
+                    key={ch.id}
+                    onClick={() => {
+                      playSoftClick();
+                      setSelectedChapterId(ch.id);
+                      setActiveNoteKey(null);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    style={{
+                      textAlign: 'left',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: 'var(--radius-sm)',
+                      border: isActive ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
+                      backgroundColor: isActive ? 'var(--accent-gold-glow)' : 'var(--bg-card)',
+                      color: isActive ? 'var(--accent-gold)' : 'var(--text-primary)',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      fontWeight: isActive ? 'bold' : 'normal',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                      Chương {ch.id}: {ch.title}
+                    </span>
+                    {isRead && <span style={{ color: 'var(--color-success)', fontWeight: 'bold', marginLeft: '0.4rem' }}>✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           <h3 className="sidebar-title" style={{ fontSize: '0.9rem', marginBottom: '1.25rem' }}>Bản chú giải học thuật</h3>
           

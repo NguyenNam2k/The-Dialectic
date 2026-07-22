@@ -16,6 +16,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
   const { xp = 0, level = 1, learnedChapters = [] } = progress;
 
   const [quoteIdx, setQuoteIdx] = useState(0);
+  const [showExtendedChapters, setShowExtendedChapters] = useState(false);
 
   const getScholarRank = (lvl) => {
     if (lvl < 3) return 'Độc giả Tập sự';
@@ -42,8 +43,9 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
     }
   };
 
-  const coverStory = chapters.find(c => c.id === 12) || chapters.find(c => c.id === 2) || chapters[0];
-  const otherStories = chapters.filter(c => c.id !== coverStory?.id);
+  const coverStory = chapters.find(c => c.id === 2) || chapters[0];
+  const mainStories = chapters.filter(c => c.id <= 7 && c.id !== coverStory?.id);
+  const extendedStories = chapters.filter(c => c.id > 7 && c.id !== coverStory?.id);
 
   const totalArticles = chapters.length || 12;
   const readCount = (learnedChapters || []).length;
@@ -64,11 +66,9 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
           <p className="cover-issue">Volume I · Tạp chí & E-Book Khảo luận Đặc biệt năm 2026</p>
           <h1 className="cover-title">THE DIALECTIC</h1>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.8rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--accent-burgundy)', fontWeight: 'bold' }}>
-            Tạp chí & E-Book Học thuật Chủ nghĩa xã hội khoa học (12 Chương)
+            Tạp chí Nghiên cứu & Khảo luận Chủ nghĩa xã hội khoa học
           </p>
         </div>
-
-        {/* Cover Hero Article */}
         {coverStory && (
           <div className="cover-hero-article card" style={{ padding: '2.5rem', border: '1px solid var(--border-color)', marginBottom: '2.5rem' }}>
             <span className="article-cat">{getChapterCategory(coverStory.id)}</span>
@@ -90,16 +90,18 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             </button>
           </div>
         )}
-
-        {/* Interactive Dialectic Historical Timeline */}
         <DialecticTimeline />
-
-        {/* Other Chapters List */}
         <div className="articles-list">
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1.5rem', textTransform: 'uppercase' }}>
-            Mục lục E-Book & Tạp chí (12 Chương)
-          </h2>
-          {otherStories.map((ch, idx) => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', textTransform: 'uppercase' }}>
+              Mục lục 7 Chương Giáo trình Chuẩn
+            </h2>
+            <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
+              7 Chương Cốt lõi
+            </span>
+          </div>
+
+          {mainStories.map((ch, idx) => (
             <div key={ch.id} className={`article-summary-card stagger-item stagger-${Math.min(idx + 1, 7)}`}>
               <div className="article-summary-content">
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -132,25 +134,85 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
               </div>
             </div>
           ))}
-        </div>
+          <div style={{ textAlign: 'center', margin: '1.5rem 0' }}>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => {
+                playSoftClick();
+                setShowExtendedChapters(!showExtendedChapters);
+              }}
+              style={{ 
+                width: '100%', 
+                padding: '0.75rem 1.5rem', 
+                fontSize: '0.85rem',
+                border: '1px dashed var(--accent-gold)',
+                color: 'var(--accent-gold)',
+                backgroundColor: 'var(--accent-gold-glow)'
+              }}
+            >
+              {showExtendedChapters 
+                ? '▲ Thu gọn 5 chuyên đề mở rộng' 
+                : '▼ Xem thêm 5 chuyên đề lý luận mở rộng (Chương 8 - 12)'
+              }
+            </button>
+          </div>
+          {showExtendedChapters && (
+            <div className="page-transition" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem', borderTop: '2px dashed var(--border-color)', paddingTop: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', color: 'var(--accent-gold)' }}>
+                  Chuyên đề Mở rộng (Chương 8 - 12)
+                </h3>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Chuyên sâu & Hiện đại</span>
+              </div>
 
-        {/* Interactive Socialist Radar Indicator Simulator */}
+              {extendedStories.map((ch, idx) => (
+                <div key={ch.id} className="article-summary-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                  <div className="article-summary-content">
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      <span className="article-cat">{getChapterCategory(ch.id)}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>⏱ {ch.readTime || '9 phút đọc'}</span>
+                    </div>
+                    <h3 className="article-title-link" style={{ cursor: 'pointer' }} onClick={() => {
+                      playSoftClick();
+                      setSelectedChapterId(ch.id);
+                      setView('reader');
+                    }}>
+                      Chương {ch.id}: {ch.title}
+                    </h3>
+                    <p className="article-excerpt">
+                      {ch.intro ? ch.intro.substring(0, 140) : ''}...
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={() => {
+                        playSoftClick();
+                        setSelectedChapterId(ch.id);
+                        setView('reader');
+                      }}
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
+                    >
+                      {(learnedChapters || []).includes(ch.id) ? '✓ Đọc lại' : 'Đọc bài'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <SocialistRadar />
       </div>
-
-      {/* Right Sidebar Panel */}
       <div className="sidebar-panel">
         <div>
           <h3 className="sidebar-title">Lời nói đầu E-Book</h3>
           <p className="editorial-note">
-            "Tập san & E-Book Biện chứng được biên soạn dưới dạng dòng chảy tạp chí học thuật lai sách điện tử 12 chương. Toàn bộ kiến thức lý luận chuẩn quốc gia được trực quan hóa thành các biểu đồ động lực học lịch sử, biên bản đối thoại kiểm duyệt và bài khảo luận chuyên sâu."
+            "Tập san & E-Book Biện chứng được biên soạn dưới dạng dòng chảy tạp chí học thuật lai sách điện tử. Toàn bộ kiến thức lý luận chuẩn quốc gia được trực quan hóa thành các biểu đồ động lực học lịch sử, biên bản đối thoại kiểm duyệt và bài khảo luận chuyên sâu."
           </p>
           <p className="editorial-note" style={{ textAlign: 'right', fontWeight: 'bold' }}>
             — Ban Biên Tập
           </p>
         </div>
-
-        {/* Daily Dialectic Quote Widget */}
         <div className="card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', margin: '2rem 0', backgroundColor: 'var(--bg-card)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent-gold)' }}>
@@ -172,8 +234,6 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             — {currentQuote.author} <span style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>({currentQuote.work})</span>
           </div>
         </div>
-
-        {/* Reader Scholar Progress Card */}
         <div className="card" style={{ border: '1px solid var(--border-color)', padding: '1.5rem' }}>
           <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
             Độ sâu Tri thức Độc giả (12 Chương)
