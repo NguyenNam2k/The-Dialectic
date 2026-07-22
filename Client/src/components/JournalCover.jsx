@@ -30,7 +30,7 @@ const rawQuotes = [
     work: "Luận cương về Feuerbach, Luận cương XI (1845)" 
   },
   { 
-    text: "Hhọc thuyết của Mác là học thuyết vạn năng vì nó là một học thuyết chính xác.", 
+    text: "Học thuyết của Mác là học thuyết vạn năng vì nó là một học thuyết chính xác.", 
     author: "V.I. Lênin", 
     work: "Ba nguồn gốc và ba bộ phận hợp thành của chủ nghĩa Mác (1913)" 
   },
