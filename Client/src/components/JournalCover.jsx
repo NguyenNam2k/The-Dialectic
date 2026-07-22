@@ -44,8 +44,8 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
   };
 
   const coverStory = chapters.find(c => c.id === 2) || chapters[0];
-  const mainStories = chapters.filter(c => c.id <= 7 && c.id !== coverStory?.id);
-  const extendedStories = chapters.filter(c => c.id > 7 && c.id !== coverStory?.id);
+  const mainStories = chapters.filter(c => c.id <= 7);
+  const extendedStories = chapters.filter(c => c.id > 7);
 
   const totalArticles = chapters.length || 12;
   const readCount = (learnedChapters || []).length;
@@ -60,7 +60,6 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
 
   return (
     <div className="cover-container page-transition">
-      {/* Left Column */}
       <div>
         <div className="cover-masthead">
           <p className="cover-issue">Volume I · Tạp chí & E-Book Khảo luận Đặc biệt năm 2026</p>
@@ -91,6 +90,8 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
           </div>
         )}
         <DialecticTimeline />
+
+        {/* Main 7 Chapters List */}
         <div className="articles-list">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', textTransform: 'uppercase' }}>
