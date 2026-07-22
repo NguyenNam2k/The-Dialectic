@@ -1,10 +1,62 @@
 {
-  "xp": 40,
+  "xp": 60,
   "level": 1,
   "learnedChapters": [],
   "debateCompleted": [
     "roundtable-1"
   ],
-  "quizHistory": [],
+  "quizHistory": [
+    {
+      "date": "2026-07-22T07:15:17.532Z",
+      "score": 0,
+      "totalQuestions": 20,
+      "duration": 6,
+      "xpGained": 20,
+      "weakChapters": [
+        {
+          "chapterId": 1,
+          "rate": 0,
+          "total": 3,
+          "correct": 0
+        },
+        {
+          "chapterId": 2,
+          "rate": 0,
+          "total": 5,
+          "correct": 0
+        },
+        {
+          "chapterId": 3,
+          "rate": 0,
+          "total": 2,
+          "correct": 0
+        },
+        {
+          "chapterId": 4,
+          "rate": 0,
+          "total": 2,
+          "correct": 0
+        },
+        {
+          "chapterId": 5,
+          "rate": 0,
+          "total": 2,
+          "correct": 0
+        },
+        {
+          "chapterId": 6,
+          "rate": 0,
+          "total": 1,
+          "correct": 0
+        },
+        {
+          "chapterId": 7,
+          "rate": 0,
+          "total": 5,
+          "correct": 0
+        }
+      ]
+    }
+  ],
   "bookmarks": []
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { playSoftClick, playSuccessChime } from '../utils/soundEffects';
 
-// High-precision Fisher-Yates (Knuth) Shuffle Algorithm
 function shuffle(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -24,12 +23,10 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
   const [questions, setQuestions] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
-  const [practiceChecked, setPracticeChecked] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
-  const [durationSecs, setDurationSecs] = useState(0);
 
   const [report, setReport] = useState(null);
 
@@ -48,11 +45,9 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
       candidateCards = flashcards.filter(f => f.chapter === chapterId);
     }
 
-    // Double-pass Fisher-Yates shuffle on the question order
     const shuffledQuestions = shuffle(shuffle(candidateCards));
 
     return shuffledQuestions.map((card) => {
-      // Pick 3 unique distractors from the global flashcard pool
       const otherCards = flashcards.filter(item => item.back !== card.back);
       const shuffledOthers = shuffle(shuffle(otherCards));
       
@@ -64,20 +59,37 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
         if (distractors.length === 3) break;
       }
 
-      // Combine correct answer + 3 distractors
-      const rawOptions = [card.back, ...distractors];
-      // Triple-pass shuffle on A, B, C, D option positions
-      const options = shuffle(shuffle(shuffle(rawOptions)));
+      const promptLower = card.front.toLowerCase();
+      const isTFNG = promptLower.includes('đúng / sai / không đề cập') || promptLower.includes('t/f/ng') || promptLower.includes('không đề cập');
+      const isTF = promptLower.includes('đúng hay sai') || promptLower.includes('đúng/sai');
+
+      let options = [];
+      if (isTFNG) {
+        options = ['Đúng (True)', 'Sai (False)', 'Không đề cập / Chưa đủ căn cứ (Not Given)'];
+      } else if (isTF) {
+        options = ['Đúng (True)', 'Sai (False)'];
+      } else {
+        const rawOptions = [card.back, ...distractors];
+        options = shuffle(shuffle(shuffle(rawOptions)));
+      }
       
       const prompt = card.front.startsWith('Nhận diện nội dung:')
         ? `Khái niệm hoặc nội dung nào phù hợp với mô tả sau? ${card.front.replace('Nhận diện nội dung:', '').trim()}`
         : card.front;
 
+      let correctIdx = options.indexOf(card.back);
+      if (correctIdx === -1) {
+        if (card.back.toLowerCase().includes('đúng')) correctIdx = 0;
+        else if (card.back.toLowerCase().includes('sai')) correctIdx = 1;
+        else if (card.back.toLowerCase().includes('không')) correctIdx = 2;
+        else correctIdx = 0;
+      }
+
       return {
         chapter: card.chapter,
         q: prompt,
         options,
-        answer: options.indexOf(card.back),
+        answer: correctIdx,
         explain: card.back
       };
     });
@@ -97,12 +109,10 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
     setQuestions(selectedQuestions);
     setUserAnswers({});
     setCurrentIdx(0);
-    setPracticeChecked(false);
     setStatus('session');
 
     const totalTime = count * 45;
     setTimeLeft(totalTime);
-    setDurationSecs(totalTime);
     startTimeRef.current = Date.now();
 
     if (setup.mode === 'exam') {
@@ -224,29 +234,22 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
   };
 
   const handleSelectOption = (idx) => {
-    if (setup.mode === 'practice' && practiceChecked) return;
+    if (userAnswers[currentIdx] !== undefined) return;
     playSoftClick();
-    setUserAnswers({ ...userAnswers, [currentIdx]: idx });
-  };
-
-  const handlePracticeCheck = () => {
-    playSoftClick();
-    setPracticeChecked(true);
+    setUserAnswers(prev => ({ ...prev, [currentIdx]: idx }));
   };
 
   const handleNext = () => {
-    playSoftClick();
     if (currentIdx + 1 < questions.length) {
+      playSoftClick();
       setCurrentIdx(prev => prev + 1);
-      setPracticeChecked(false);
     }
   };
 
   const handlePrev = () => {
-    playSoftClick();
     if (currentIdx > 0) {
+      playSoftClick();
       setCurrentIdx(prev => prev - 1);
-      setPracticeChecked(false);
     }
   };
 
@@ -267,9 +270,6 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
               ← Quay lại Trang bìa
             </button>
           )}
-          <span style={{ fontSize: '0.8rem', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
-            📚 Ngân hàng {totalBankSize} câu hỏi độc lập
-          </span>
         </div>
 
         <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center', border: '1px solid var(--border-color)' }}>
@@ -278,7 +278,7 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
             Tự Đánh Giá Độc Giả
           </h1>
           <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem auto' }}>
-            Hệ thống ngẫu nhiên hóa ngẫu nhiên 100% thứ tự câu hỏi và thứ tự vị trí đáp án (A, B, C, D) từ ngân hàng <strong>{totalBankSize} câu hỏi</strong> chuẩn quốc gia.
+            Hãy kiểm tra mức độ tiếp thu kiến thức các chuyên mục bài viết của tạp chí bằng bài đánh giá độc giả ngắn dưới đây.
           </p>
 
           <div className="exam-config-row">
@@ -307,7 +307,7 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
                 onChange={(e) => { playSoftClick(); setSetup({ ...setup, count: Number(e.target.value) }); }}
               >
                 {[10, 20, 30, 50, 70, 100].map(c => (
-                  <option key={c} value={c}>{c} câu ngẫu nhiên</option>
+                  <option key={c} value={c}>{c} câu khảo sát</option>
                 ))}
               </select>
             </div>
@@ -319,7 +319,7 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
                 value={setup.mode}
                 onChange={(e) => { playSoftClick(); setSetup({ ...setup, mode: e.target.value }); }}
               >
-                <option value="practice">Đọc hiểu nhanh (Xem đáp án ngay)</option>
+                <option value="practice">Đọc hiểu nhanh (Xem đáp án tự động)</option>
                 <option value="exam">Đánh giá toàn diện (Bấm giờ)</option>
               </select>
             </div>
@@ -337,6 +337,8 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
     const q = questions[currentIdx];
     const progressPercent = Math.round(((currentIdx + 1) / questions.length) * 100);
     const chosenOption = userAnswers[currentIdx];
+    const isAnswered = chosenOption !== undefined;
+    const isLastQuestion = currentIdx === questions.length - 1;
 
     return (
       <div className="exam-container page-transition">
@@ -344,7 +346,7 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
           <div>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem' }}>Phiếu Đọc Hiểu Tự Đánh Giá</h2>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Bài viết số {q.chapter} · Câu hỏi đọc hiểu số {currentIdx + 1}
+              Bài viết số {q.chapter} · Câu hỏi số {currentIdx + 1} / {questions.length}
             </span>
           </div>
 
@@ -355,9 +357,9 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
           )}
         </div>
 
-        {/* Progress */}
+        {/* Progress Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-          <span>Tiến trình: {currentIdx + 1} / {questions.length} câu</span>
+          <span>Tiến trình: Câu {currentIdx + 1} / {questions.length}</span>
           <span>Hoàn thành: {progressPercent}%</span>
         </div>
         <div className="exam-progress-bar-container" style={{ height: '4px', marginBottom: '1.75rem' }}>
@@ -370,13 +372,14 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
             {q.q}
           </h3>
 
+          {/* Options list */}
           <div className="options-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {q.options.map((opt, idx) => {
               const isSelected = chosenOption === idx;
               let optionClass = 'option-card';
               if (isSelected) optionClass += ' selected';
 
-              if (setup.mode === 'practice' && practiceChecked) {
+              if (isAnswered) {
                 if (idx === q.answer) optionClass += ' correct';
                 else if (isSelected && idx !== q.answer) optionClass += ' incorrect';
               }
@@ -388,7 +391,8 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
                   style={{
                     border: isSelected ? '1px solid var(--accent-burgundy)' : '1px solid var(--border-color)',
                     padding: '1rem 1.25rem',
-                    borderRadius: 'var(--radius-sm)'
+                    borderRadius: 'var(--radius-sm)',
+                    cursor: isAnswered ? 'default' : 'pointer'
                   }}
                   onClick={() => handleSelectOption(idx)}
                 >
@@ -399,15 +403,20 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
             })}
           </div>
 
-          {setup.mode === 'practice' && practiceChecked && (
-            <div className="note-box" style={{ marginTop: '1.5rem' }}>
-              <div className="note-box-title">💡 Giải thích lý luận:</div>
-              <div className="note-box-body">{q.explain}</div>
+          {/* Automatic Feedback right upon choosing an answer */}
+          {isAnswered && (
+            <div className="note-box page-transition" style={{ marginTop: '1.5rem' }}>
+              <div className="note-box-title" style={{ color: chosenOption === q.answer ? 'var(--color-success)' : 'var(--color-error)' }}>
+                {chosenOption === q.answer ? '✓ Đáp án chính xác!' : '✗ Chưa chính xác!'}
+              </div>
+              <div className="note-box-body" style={{ marginTop: '0.25rem' }}>
+                <strong>Giải thích lý luận:</strong> {q.explain}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Controls */}
+        {/* Option 1 Actions */}
         <div className="exam-actions">
           <button
             className="btn btn-secondary"
@@ -417,27 +426,25 @@ export default function ReaderAssessment({ progress, data, saveProgress, setView
             ← Câu trước
           </button>
 
-          {setup.mode === 'practice' && !practiceChecked && chosenOption !== undefined && (
-            <button className="btn btn-primary" onClick={handlePracticeCheck} style={{ backgroundColor: 'var(--accent-gold)' }}>
-              Kiểm tra luận điểm
-            </button>
-          )}
-
-          {currentIdx + 1 < questions.length ? (
+          {!isAnswered ? (
+            <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold)', fontStyle: 'italic', fontWeight: 'bold' }}>
+              👉 Chọn 1 đáp án ở trên để mở khóa câu tiếp theo
+            </span>
+          ) : isLastQuestion ? (
             <button
-              className="btn btn-secondary"
-              onClick={handleNext}
-              disabled={setup.mode === 'practice' && !practiceChecked && chosenOption !== undefined}
+              className="btn btn-primary"
+              onClick={submitExam}
+              style={{ backgroundColor: 'var(--color-success)', padding: '0.6rem 1.5rem' }}
             >
-              Câu tiếp theo →
+              Hoàn thành & Gửi bài đánh giá (+XP)
             </button>
           ) : (
             <button
               className="btn btn-primary"
-              onClick={submitExam}
-              disabled={setup.mode === 'practice' && !practiceChecked && chosenOption !== undefined}
+              onClick={handleNext}
+              style={{ padding: '0.6rem 1.5rem' }}
             >
-              Gửi bài đánh giá
+              Câu tiếp theo →
             </button>
           )}
         </div>

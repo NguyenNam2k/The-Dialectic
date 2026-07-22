@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import DialecticTimeline from './DialecticTimeline';
 import SocialistRadar from './SocialistRadar';
-import { playSoftClick } from '../utils/soundEffects';
+import { playSoftClick, playSuccessChime } from '../utils/soundEffects';
 
 const rawQuotes = [
   { 
@@ -56,6 +57,13 @@ const rawQuotes = [
   }
 ];
 
+const scholarBadges = [
+  { id: 'badge-1', levelReq: 1, title: '📜 Độc giả Tập sự', desc: 'Gia nhập Tạp chí Biện chứng & tiếp thu bài khảo luận nhập môn đầu tiên.', rewardText: 'Mở khóa Huy hiệu Độc giả' },
+  { id: 'badge-2', levelReq: 3, title: '🎖️ Nhiệt huyết Lý luận', desc: 'Đạt Cấp 3 (Nghiên cứu sinh Biện chứng) & làm chủ 300+ Điểm luận thuyết.', rewardText: 'Nhận Bằng Tuyên dương Cấp 3' },
+  { id: 'badge-3', levelReq: 6, title: '✒️ Bút sắc Phản biện', desc: 'Đạt Cấp 6 (Học giả Học thuyết Marx) & kiểm duyệt thành công 6 Bàn tròn.', rewardText: 'Nhận Biểu trưng Học giả' },
+  { id: 'badge-4', levelReq: 10, title: '👑 Viện sĩ', desc: 'Đạt Cấp 10 (Viện sĩ) — Đạt đỉnh cao nhận thức triết học biện chứng.', rewardText: 'Nhận Huân chương Viện sĩ' }
+];
+
 function shuffle(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -72,6 +80,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
   const [shuffledQuotes, setShuffledQuotes] = useState(() => shuffle(rawQuotes));
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [showExtendedChapters, setShowExtendedChapters] = useState(false);
+  const [activeBadgeModal, setActiveBadgeModal] = useState(null);
 
   useEffect(() => {
     setShuffledQuotes(shuffle(rawQuotes));
@@ -123,6 +132,15 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
   const handleNextQuote = () => {
     playSoftClick();
     setQuoteIdx((prev) => (prev + 1) % shuffledQuotes.length);
+  };
+
+  const handleOpenBadgeModal = (badge) => {
+    if (level >= badge.levelReq) {
+      playSuccessChime();
+    } else {
+      playSoftClick();
+    }
+    setActiveBadgeModal(badge);
   };
 
   return (
@@ -309,7 +327,7 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
           </div>
         </div>
 
-        <div className="card" style={{ border: '1px solid var(--border-color)', padding: '1.5rem' }}>
+        <div className="card" style={{ border: '1px solid var(--border-color)', padding: '1.5rem', marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
             Độ sâu Tri thức Độc giả (12 Chương)
           </h3>
@@ -344,7 +362,125 @@ export default function JournalCover({ progress, data, setView, setSelectedChapt
             Tự Đánh Giá Độc Giả
           </button>
         </div>
+
+        {/* Scholar Badges Showcase */}
+        <div className="card" style={{ border: '1px solid var(--border-color)', padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1rem', margin: 0 }}>
+              🏆 Huy hiệu & Tuyên dương Học vị
+            </h3>
+            <span style={{ fontSize: '0.7rem', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
+              4 Cột mốc Phần thưởng
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            {scholarBadges.map((badge) => {
+              const isUnlocked = level >= badge.levelReq;
+              return (
+                <div
+                  key={badge.id}
+                  onClick={() => handleOpenBadgeModal(badge)}
+                  style={{
+                    backgroundColor: isUnlocked ? 'var(--accent-gold-glow)' : 'var(--bg-card)',
+                    border: isUnlocked ? '1.5px solid var(--accent-gold)' : '1px dashed var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '0.75rem 0.5rem',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    opacity: isUnlocked ? 1 : 0.6,
+                    transition: 'all 0.25s ease'
+                  }}
+                  title={isUnlocked ? `Đã mở khóa: ${badge.title}` : `Yêu cầu đạt Cấp ${badge.levelReq}`}
+                >
+                  <div style={{ fontSize: '1.6rem', marginBottom: '0.2rem' }}>{badge.title.split(' ')[0]}</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: isUnlocked ? 'var(--accent-burgundy)' : 'var(--text-muted)' }}>
+                    {badge.title.substring(2)}
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                    {isUnlocked ? '✓ Đã nhận' : `Cấp ${badge.levelReq}`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
+
+      {/* Scholar Rank Reward Full-Screen Portal Modal attached directly to document.body */}
+      {activeBadgeModal && createPortal(
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0,
+            bottom: 0,
+            width: '100vw', 
+            height: '100vh', 
+            backgroundColor: 'rgba(0, 0, 0, 0.82)', 
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            zIndex: 99999 
+          }}
+          onClick={() => setActiveBadgeModal(null)}
+        >
+          <div 
+            className="card page-transition" 
+            style={{ 
+              maxWidth: '460px', 
+              width: '90%', 
+              padding: '2.5rem', 
+              textAlign: 'center', 
+              border: '2px solid var(--accent-gold)', 
+              backgroundColor: 'var(--bg-card)',
+              boxShadow: '0 30px 70px rgba(0,0,0,0.8)',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>
+              {activeBadgeModal.title.split(' ')[0]}
+            </div>
+            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
+              Bằng Tuyên Dương Học vị
+            </span>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: 'var(--accent-burgundy)', margin: '0.5rem 0' }}>
+              {activeBadgeModal.title}
+            </h2>
+
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+              {activeBadgeModal.desc}
+            </p>
+
+            <div style={{ backgroundColor: level >= activeBadgeModal.levelReq ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)', border: level >= activeBadgeModal.levelReq ? '1px solid var(--color-success)' : '1px solid var(--color-error)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+              {level >= activeBadgeModal.levelReq ? (
+                <span style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
+                  ✓ Đã ghi danh vào Sổ vàng Học giả Tạp chí The Dialectic!
+                </span>
+              ) : (
+                <span style={{ color: 'var(--color-error)' }}>
+                  🔒 Yêu cầu đạt Cấp {activeBadgeModal.levelReq} (Hiện tại: Cấp {level})
+                </span>
+              )}
+            </div>
+
+            <button 
+              className="btn btn-primary" 
+              onClick={() => {
+                playSoftClick();
+                setActiveBadgeModal(null);
+              }}
+            >
+              Đóng Bằng Tuyên Dương
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
