@@ -29,7 +29,7 @@ export default function SocialistRadar() {
   const cultureGap = llsx - vh;
   const demoGap = llsx - ((dc + pq) / 2);
   let stateMeta = {
-    title: '🟢 Hình thái Quá độ Tiên tiến',
+    title: 'Hình thái Quá độ Tiên tiến',
     desc: 'Các trụ cột phát triển đồng bộ, mâu thuẫn biện chứng được giải quyết hài hòa.',
     advice: 'Tiếp tục thúc đẩy đổi mới sáng tạo, chuyển đổi số và nâng cao chất lượng cuộc sống.',
     statusClass: 'status-good',
@@ -40,7 +40,7 @@ export default function SocialistRadar() {
 
   if (avg < 35) {
     stateMeta = {
-      title: '🔴 Khủng hoảng Sơ khai & Trầm lắng',
+      title: 'Khủng hoảng Sơ khai & Trầm lắng',
       desc: 'Hình thái kinh tế - xã hội ở mức phát triển rất thấp, lực lượng sản xuất yếu kém.',
       advice: 'Tập trung đẩy mạnh công nghiệp hóa, hiện đại hóa và nâng cao trình độ dân trí.',
       statusClass: 'status-danger',
@@ -50,7 +50,7 @@ export default function SocialistRadar() {
     };
   } else if (econGap > 35) {
     stateMeta = {
-      title: '🟠 Mâu thuẫn LLSX & QHSX (Lệch pha Kinh tế)',
+      title: 'Mâu thuẫn LLSX & QHSX (Lệch pha Kinh tế)',
       desc: 'Lực lượng sản xuất phát triển nóng nhưng Quan hệ sản xuất chưa thích ứng kịp.',
       advice: 'Cần điều chỉnh ngay thể chế sở hữu, quản lý và phân phối để tránh bóc lột tư bản.',
       statusClass: 'status-warning',
@@ -60,7 +60,7 @@ export default function SocialistRadar() {
     };
   } else if (demoGap > 30) {
     stateMeta = {
-      title: '🟡 Mâu thuẫn Kiến trúc Thượng tầng (Thiếu Dân chủ/Pháp quyền)',
+      title: 'Mâu thuẫn Kiến trúc Thượng tầng (Thiếu Dân chủ/Pháp quyền)',
       desc: 'Kinh tế tăng trưởng nhưng Thiết chế Dân chủ và Pháp quyền XHCN bị chậm chân.',
       advice: 'Cần tăng cường thực thi Dân chủ XHCN và xây dựng Nhà nước Pháp quyền của dân, do dân, vì dân.',
       statusClass: 'status-warning',
@@ -70,7 +70,7 @@ export default function SocialistRadar() {
     };
   } else if (cultureGap > 35) {
     stateMeta = {
-      title: '🟣 Mâu thuẫn Văn hóa & Giá trị Tinh thần',
+      title: 'Mâu thuẫn Văn hóa & Giá trị Tinh thần',
       desc: 'Công nghệ & Kinh tế phát triển nhưng Nền tảng Văn hóa con người bị suy giảm.',
       advice: 'Cần tập trung phát triển văn hóa XHCN tiên tiến, đậm đà bản sắc và xây dựng con người toàn diện.',
       statusClass: 'status-warning',
@@ -80,7 +80,7 @@ export default function SocialistRadar() {
     };
   } else if (avg >= 85 && diff <= 18) {
     stateMeta = {
-      title: '🏆 Xã hội Chủ nghĩa Hài hòa & Tối ưu',
+      title: 'Xã hội Chủ nghĩa Hài hòa & Tối ưu',
       desc: 'Lực lượng sản xuất hiện đại kết hợp hoàn hảo với Quan hệ sản xuất tiến bộ và Dân chủ số.',
       advice: 'Đạt trạng thái tối ưu theo mục tiêu "Dân giàu, nước mạnh, dân chủ, công bằng, văn minh".',
       statusClass: 'status-ideal',
@@ -103,11 +103,10 @@ export default function SocialistRadar() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem', alignItems: 'center' }}>
-        {/* Slider Sliders Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-              <span>⚙️ Lực lượng sản xuất (LLSX):</span>
+              <span>⚙️ Lực lượng sản xuất:</span>
               <span style={{ color: 'var(--accent-burgundy)' }}>{llsx}%</span>
             </div>
             <input
@@ -122,7 +121,7 @@ export default function SocialistRadar() {
 
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-              <span>🤝 Quan hệ sản xuất (QHSX):</span>
+              <span>🤝 Quan hệ sản xuất:</span>
               <span style={{ color: 'var(--accent-burgundy)' }}>{qhsx}%</span>
             </div>
             <input
@@ -137,7 +136,7 @@ export default function SocialistRadar() {
 
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-              <span>🏛️ Văn hóa & Con người (VHKH):</span>
+              <span>🏛️ Văn hóa & Con người:</span>
               <span style={{ color: 'var(--accent-burgundy)' }}>{vh}%</span>
             </div>
             <input
@@ -152,7 +151,7 @@ export default function SocialistRadar() {
 
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-              <span>🗳️ Dân chủ xã hội chủ nghĩa (DCXH):</span>
+              <span>🗳️ Dân chủ xã hội chủ nghĩa:</span>
               <span style={{ color: 'var(--accent-burgundy)' }}>{dc}%</span>
             </div>
             <input
@@ -167,7 +166,7 @@ export default function SocialistRadar() {
 
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-              <span>⚖️ Nhà nước Pháp quyền (PQXH):</span>
+              <span>⚖️ Nhà nước Pháp quyền:</span>
               <span style={{ color: 'var(--accent-burgundy)' }}>{pq}%</span>
             </div>
             <input
@@ -180,8 +179,6 @@ export default function SocialistRadar() {
             />
           </div>
         </div>
-
-        {/* Dynamic Multi-State Result Box */}
         <div 
           className="page-transition" 
           style={{ 
